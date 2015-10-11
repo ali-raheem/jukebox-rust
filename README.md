@@ -9,12 +9,16 @@ e.g. RFID keys to actions e.g. playing an album.
 Usage:	./target/debug/jukebox [options]
 
 Options:
-    -f, --database PATH Suggest a name for the database file default
-                        ./jukebox.db
     -h, --help          Print this usage information.
     -n, --new           Start new database.
     -a, --add           Add mode, add new action triggers to database.
+    -f, --database PATH Suggest a name for the database file default
+                        ./jukebox.db
     -p, --port PATH     Serial port to use default /dev/ttyACM0
+    -s, --split Start:Length
+                        Process key trim first Start chars and continue for
+                        length chars default 3:10.
+
 ```
 
 Example usage would be putting a RFID tag/card in a CD case and using it to trigger your computer to play said album.
