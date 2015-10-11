@@ -31,5 +31,3 @@ It is suggested to make a database like in the current directory and then copy i
 Then to run jukebox *should not* run as root.
 Use a udev rule to make the serial device readble by the user you run jukebox as.
 
-###### ToDo
-Fix add mode.
