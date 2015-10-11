@@ -1,10 +1,11 @@
 # Jukebox-rust
 
-Rust implementation of a jukebox application which allows RFID tags to trigger commands such as opening pictures or play albums.
+Rust implementation of my jukebox application which allows RFID tags to trigger commands such as opening pictures or play albums.
 
 ```
 ali@ali-K53E:~/Code/Rust/jukebox$ ./target/debug/jukebox -h
-Jukebox is a program which connects triggers e.g. RFID keys to actions e.g. playing an album.
+Jukebox is a program which connects triggers
+e.g. RFID keys to actions e.g. playing an album.
 Usage:	./target/debug/jukebox [options]
 
 Options:
@@ -25,7 +26,7 @@ To build run:
 cargo build --release
 ```
 
-### Running
+#### Running
 It is suggested to make a database like in the current directory and then copy it to /etc and make it root writeable but world readable.
 Then to run jukebox *should not* run as root.
 Use a udev rule to make the serial device readble by the user you run jukebox as.
