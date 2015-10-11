@@ -8,6 +8,7 @@ use std::fmt;
 use std::env;
 use std::process::Command;
 use std::io::Read;
+use std::io;
 
 struct Action {
 	cmd: String,
@@ -45,10 +46,10 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 	let prog_name = args[0].clone();
     let mut prog_opts = Options::new();
-    prog_opts.optopt("f", "database", "Suggest a name for the database file default ./jukebox.db", "PATH");
     prog_opts.optflag("h", "help", "Print this usage information.");
     prog_opts.optflag("n", "new", "Start new database.");
     prog_opts.optflag("a", "add", "Add mode, add new action triggers to database.");
+    prog_opts.optopt("f", "database", "Suggest a name for the database file default ./jukebox.db", "PATH");
     prog_opts.optopt("p", "port", "Serial port to use default /dev/ttyACM0", "PATH");
     let prog_opts_matches = match prog_opts.parse(&args[1..]) {
     	Ok(m) => { m }
@@ -74,10 +75,22 @@ fn main() {
 		)", &[]).unwrap();
 		return;
 	} else if prog_opts_matches.opt_present("a") {
-		let new_cmd = Action::new("eog /home/ali/Pictures/1080p-HD-Wallpapers-9.jpg", "52001525EA");
-    	conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)", &[&new_cmd.cmd, &new_cmd.key]).unwrap();
-		let new_cmd = Action::new("rhythmbox /home/ali/Downloads/ACDC_-_Back_In_Black-sample.ogg", "5200152E3F");
-    	conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)", &[&new_cmd.cmd, &new_cmd.key]).unwrap();
+		loop {
+			let mut cmd = String::new();
+			println!("Tap card on reader then enter command.\nCtrl+C to exit.");
+			io::stdin().read_line(&mut cmd)
+        		.ok()
+        		.expect("Failed to read line");
+			let mut input = String::new();
+			serr.read_to_string(&mut input);
+			if input.is_empty() {
+				continue;
+			}
+			input = input[3..].to_string();
+			input.truncate(10);
+    		conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)", &[&cmd, &input]).unwrap();
+    		println!("Action added command: {}, trigger: {}.", cmd, input);
+    	}
     	return;
 	}
 	loop {
