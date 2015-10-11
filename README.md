@@ -23,11 +23,15 @@ Example usage would be putting a RFID tag/card in a CD case and using it to trig
 Uses the cargo buildsystem for dependencies and building.
 To build run:
 ```
-cargo build --release
+$ cargo build --release
 ```
 
 #### Running
 It is suggested to make a database like in the current directory and then copy it to /etc and make it root writeable but world readable.
 Then to run jukebox *should not* run as root.
 Use a udev rule to make the serial device readble by the user you run jukebox as.
-
+In my case my device is in the group dialout. So I simply added my user to the group as root:
+```
+# useradd -a -G dialout ali
+```
+Where ali is your username.
