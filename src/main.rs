@@ -84,8 +84,8 @@ fn main() {
 			cmd	TEXT NOT NULL,
         	key	TEXT KEY
 		)", &[]).unwrap();
-		return;
-	} else if prog_opts_matches.opt_present("a") {
+	}
+	if prog_opts_matches.opt_present("a") {
 		loop {
 			let mut cmd = String::new();
 			println!("Tap card on reader then enter command.\nCtrl+C to exit.");
