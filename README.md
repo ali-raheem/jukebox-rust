@@ -28,9 +28,16 @@ $ cargo build --release
 
 #### Running
 It is suggested to make a database like in the current directory and then copy it to /etc and make it root writeable but world readable.
-Then to run jukebox *should not* run as root.
-Use a udev rule to make the serial device readble by the user you run jukebox as.
-In my case my device is in the group dialout. So I simply added my user to the group as root:
+
+```
+$ jukebox -f /etc/jukebox.db
+```
+
+You *should not* run jukebox as root as then an spawned commands wound run as root! By making the db root only writable you can stop someone putting a nasty command in your db.
+
+You could use a udev rule to make the serial device readble by the user you run jukebox as. In my case my device is in the group dialout. So I simply added my user to the group as root:
+It is likely you can do this too if ls -lah PATH_TO_DEVICE shows dialout as the group (if it shows another group thats not root you could add yourself to that).
+
 ```
 # useradd -a -G dialout ali
 ```
