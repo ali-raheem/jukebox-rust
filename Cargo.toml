@@ -4,6 +4,6 @@ version = "0.1.0"
 authors = ["ali"]
 
 [dependencies]
-rusqlite = "*"
+rusqlite = "0.3.1"
 getopts = "0.2"
 serial = "0.2.1"
