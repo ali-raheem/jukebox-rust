@@ -26,12 +26,27 @@ Example usage would be putting a RFID tag/card in a CD case and using it to trig
 #### Building
 Uses the cargo buildsystem for dependencies and building.
 To build run:
+
 ```
 $ cargo build --release
 ```
 
 #### Running
 It is suggested to make a database like in the current directory and then copy it to /etc and make it root writeable but world readable.
+
+First start a new database
+```
+$ jukebox -n -a
+```
+This will initialise a new database file by default jukebox.db and start in adder mode allowing you to scan in keys and commands.
+
+To do this tap cards on the reader to load it's buffer with the string and then enert the command to associate with it in jukebox.
+
+This will loop endlessly until you ctrl-c (kill the program).
+
+It is suggested you copy the database somewhere more secure and make it owned by root but readable by the jukebox user.
+
+To run in production mode might look like this
 
 ```
 $ jukebox -f /etc/jukebox.db
