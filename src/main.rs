@@ -22,14 +22,14 @@ impl fmt::Display for Action {
 }
 
 impl Action {
-/*
-	fn new(cmd: &str,  key: &str) -> Action {
-		Action {
-			cmd: cmd.to_string(),
-			key: key.to_string(),
-		}
-	}
-*/
+    //
+    // fn new(cmd: &str,  key: &str) -> Action {
+    // Action {
+    // cmd: cmd.to_string(),
+    // key: key.to_string(),
+    // }
+    // }
+    //
     fn exec(self) {
         let cmd_status = Command::new("sh")
                              .arg("-c")
@@ -144,14 +144,27 @@ fn main() {
         input = input[key_start_char..].to_string();
         input.truncate(key_length);
         println!("Serial device said {}.", input);
-        let mut sql_req = conn.prepare("SELECT cmd, key FROM jukebox WHERE key = (?)").unwrap();
-        let action_iter = sql_req.query_map(&[&input], |row| {
-                                     Action {
-                                         cmd: row.get(0),
-                                         key: row.get(1),
-                                     }
-                                 })
-                                 .unwrap();
+        let mut sql_req = match conn.prepare("SELECT cmd, key FROM jukebox WHERE key = (?)") {
+            Ok(x) => {
+                x
+            }
+            Err(_) => {
+                continue;
+            }
+        };
+        let action_iter = match sql_req.query_map(&[&input], |row| {
+            Action {
+                cmd: row.get(0),
+                key: row.get(1),
+            }
+        }) {
+            Ok(x) => {
+                x
+            }
+            Err(_) => {
+                continue;
+            }
+        };
         for action in action_iter {
             match action {
                 Ok(trigger) => {
@@ -162,6 +175,6 @@ fn main() {
                     println!("Not an action.")
                 }
             }
-        };
+        }
     }
 }
