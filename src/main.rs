@@ -90,12 +90,19 @@ fn main() {
     let split_str_vec: Vec<&str> = split_str.split(":").collect();
     let key_start_char: usize = split_str_vec[0].parse().unwrap();
     let key_length: usize = split_str_vec[1].parse().unwrap();
-    let mut serr = match prog_opts_matches.opt_str("p") {
+    let device = match prog_opts_matches.opt_str("p") {
         Some(p) => {
-            serial::open(&p).unwrap()
+            p.to_owned()
         }
         None => {
-            serial::open("/dev/ttyACM0").unwrap()
+            "/dev/ttyACM0".to_owned();
+        }
+    };
+    let mut serr = match serial::open(&device) {
+        Ok(s) => s,
+        Err(_) => {
+            println!("Fatal Error: Could not open device.");
+            return;
         }
     };
     let db_file = match prog_opts_matches.opt_str("f") {
@@ -129,10 +136,16 @@ fn main() {
             }
             input = input[key_start_char..].to_string();
             input.truncate(key_length);
-            conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)",
-                         &[&cmd, &input])
-                .unwrap();
-            println!("Action added command: {}, trigger: {}.", cmd, input);
+            match conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)",
+                               &[&cmd, &input]) {
+                Ok(_) => {
+                    println!("Action added command: {}, trigger: {}.", cmd, input);
+                }
+                Err(_) => {
+                    println!("Failed to add command: {}, trigger:{}.", cmd, input);
+                }
+            }
+
         }
     }
     loop {
