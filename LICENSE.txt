@@ -1,0 +1,11 @@
+--2015-10-23 02:10:15--  http://www.gnu.org/licenses/gpl-2.0.txt
+Resolving www.gnu.org (www.gnu.org)... 208.118.235.148, 2001:4830:134:3::a
+Connecting to www.gnu.org (www.gnu.org)|208.118.235.148|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 18092 (18K) [text/plain]
+Saving to: ‘gpl-2.0.txt’
+
+     0K .......... .......                                    100% 63.0K=0.3s
+
+2015-10-23 02:10:16 (63.0 KB/s) - ‘gpl-2.0.txt’ saved [18092/18092]
+
