@@ -61,3 +61,7 @@ It is likely you can do this too if ls -lah PATH_TO_DEVICE shows dialout as the 
 # useradd -a -G dialout ali
 ```
 Where ali is your username.
+
+#### To Do
+Make saner defaults (0:0)
+Remove more unwrap()s
