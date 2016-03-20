@@ -95,7 +95,7 @@ fn main() {
             p.to_owned()
         }
         None => {
-            "/dev/ttyACM0".to_owned();
+            "/dev/ttyACM0".to_owned()
         }
     };
     let mut serr = match serial::open(&device) {
