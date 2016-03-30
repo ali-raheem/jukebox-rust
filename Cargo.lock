@@ -1,10 +1,10 @@
 [root]
 name = "jukebox"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "getopts 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusqlite 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serial 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serial 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -66,7 +66,7 @@ dependencies = [
 
 [[package]]
 name = "serial"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ioctl-rs 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",

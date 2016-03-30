@@ -109,7 +109,7 @@ fn main() {
         Some(f) => {
             f
         }
-        None => "./jukebox.db".to_string(),
+        None => "./jukebox.db".to_owned(),
     };
     let conn = SqliteConnection::open(db_file).unwrap();
     if prog_opts_matches.opt_present("n") {
@@ -124,17 +124,14 @@ fn main() {
         loop {
             let mut cmd = String::new();
             println!("Tap card on reader then enter command.\nCtrl+C to exit.");
-            io::stdin()
-                .read_line(&mut cmd)
-                .ok()
-                .expect("Failed to read line");
+            io::stdin().read_line(&mut cmd).expect("Could not read line from STDIN.");
             cmd.trim();
             let mut input = String::new();
             let _rv = serr.read_to_string(&mut input);
             if input.is_empty() {
                 continue;
             }
-            input = input[key_start_char..].to_string();
+            input = input[key_start_char..].to_owned();
             input.truncate(key_length);
             match conn.execute("INSERT INTO jukebox (cmd, key) VALUES ($1, $2)",
                                &[&cmd, &input]) {
@@ -154,7 +151,7 @@ fn main() {
         if input.is_empty() {
             continue;
         }
-        input = input[key_start_char..].to_string();
+        input = input[key_start_char..].to_owned();
         input.truncate(key_length);
         println!("Serial device said {}.", input);
         let mut sql_req = match conn.prepare("SELECT cmd, key FROM jukebox WHERE key = (?)") {

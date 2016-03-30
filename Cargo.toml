@@ -1,7 +1,12 @@
 [package]
 name = "jukebox"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Ali Raheem <ali@TheRaheemFamily.co.uk>"]
+description = "Link serial inputs (e.g. USB RFID tags) to actions (e.g. play a movie)."
+homepage = "https://github.com/wolfmankurd/jukebox-rust/"
+repository = "https://github.com/wolfmankurd/jukebox-rust/"
+readme = "README.md"
+license = "GPL-2.0"
 
 [dependencies]
 rusqlite = "*"
