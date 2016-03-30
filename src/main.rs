@@ -31,12 +31,15 @@ impl Action {
     // }
     //
     fn exec(self) {
-        let cmd_status = Command::new("sh")
+        println!("Action: {}", self.cmd);
+        match Command::new("sh")
                              .arg("-c")
                              .arg(self.cmd)
-                             .status()
-                             .unwrap_or_else(|e| panic!("Failed to execute process: {}", e));
-        println!("process exited with: {}", cmd_status);
+            .status() {
+                Ok(_) => println!("Running."),
+                Err(_) => println!("Failed to run."),
+            };
+//        println!("Process exited with: {}", cmd_status);
     }
 }
 

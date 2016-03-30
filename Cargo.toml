@@ -1,6 +1,6 @@
 [package]
 name = "jukebox"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Ali Raheem <ali@TheRaheemFamily.co.uk>"]
 description = "Link serial inputs (e.g. USB RFID tags) to actions (e.g. play a movie)."
 homepage = "https://github.com/wolfmankurd/jukebox-rust/"
