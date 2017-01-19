@@ -4,8 +4,7 @@ extern crate serial;
 
 use getopts::Options;
 use rusqlite::SqliteConnection;
-use std::fmt;
-use std::env;
+use std::{fmt, env};
 use std::process::Command;
 use std::io::Read;
 use std::io;
@@ -22,24 +21,15 @@ impl fmt::Display for Action {
 }
 
 impl Action {
-    //
-    // fn new(cmd: &str,  key: &str) -> Action {
-    // Action {
-    // cmd: cmd.to_string(),
-    // key: key.to_string(),
-    // }
-    // }
-    //
     fn exec(self) {
         println!("Action: {}", self.cmd);
         match Command::new("sh")
                              .arg("-c")
                              .arg(self.cmd)
             .status() {
-                Ok(_) => println!("Running."),
-                Err(_) => println!("Failed to run."),
+                Ok(n) => println!("Finished, returned {}.", n),
+                Err(e) => println!("Failed to run, exit code {}.", e),
             };
-//        println!("Process exited with: {}", cmd_status);
     }
 }
 
