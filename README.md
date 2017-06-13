@@ -4,6 +4,8 @@ Rust implementation of my jukebox application which allows RFID tags to trigger 
 
 GPLv2
 
+v 0.1.5
+
 ```
 ali@ali-K53E:~/Code/Rust/jukebox$ ./target/debug/jukebox -h
 Jukebox is a program which connects triggers
@@ -66,3 +68,9 @@ Where ali is your username.
 
 #### To Do
 Make saner defaults (0:0)
+
+#### Changelog
+
+* 2017-06-13 - Use Connection not SqliteConnection for modern rusqlite.
+               Builds with rustc 1.19.0-nightly (cfb5debbc 2017-06-12)
+               

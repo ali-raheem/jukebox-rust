@@ -3,7 +3,7 @@ extern crate getopts;
 extern crate serial;
 
 use getopts::Options;
-use rusqlite::SqliteConnection;
+use rusqlite::Connection;
 use std::{fmt, env};
 use std::process::Command;
 use std::io::Read;
@@ -104,7 +104,7 @@ fn main() {
         }
         None => "./jukebox.db".to_owned(),
     };
-    let conn = SqliteConnection::open(db_file).unwrap();
+    let conn = Connection::open(db_file).unwrap();
     if prog_opts_matches.opt_present("n") {
         conn.execute("CREATE TABLE jukebox (
 			cmd	TEXT NOT NULL,
