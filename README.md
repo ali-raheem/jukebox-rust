@@ -71,6 +71,6 @@ Make saner defaults (0:0)
 
 #### Changelog
 
-* 2017-06-13 - Use Connection not SqliteConnection for modern rusqlite.
-               Builds with rustc 1.19.0-nightly (cfb5debbc 2017-06-12)
+* 2017-06-14 - Gracefully handle unknown arguments
+* 2017-06-13 - Use Connection not SqliteConnection for modern rusqlite. Builds with rustc 1.19.0-nightly (cfb5debbc 2017-06-12)
                
