@@ -65,7 +65,8 @@ fn main() {
             m
         }
         Err(f) => {
-            panic!(f.to_string())
+            println!("Fatal Error: Unknown command line option {}", f);
+            return;
         }
     };
     if prog_opts_matches.opt_present("h") {
