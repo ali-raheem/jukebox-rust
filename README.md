@@ -4,7 +4,7 @@ Rust implementation of my jukebox application which allows RFID tags to trigger 
 
 GPLv2
 
-v 0.1.5
+v 0.1.6
 
 ```
 ali@ali-K53E:~/Code/Rust/jukebox$ ./target/debug/jukebox -h
