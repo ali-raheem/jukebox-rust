@@ -29,6 +29,9 @@ Example usage would be putting a RFID tag/card in a CD case and using it to trig
 
 #### Building
 Uses the cargo buildsystem for dependencies and building.
+
+Install developement libraries for sqlite3 (sudo dnf install lib-sqlite3x-devel).
+
 To build run:
 
 ```
