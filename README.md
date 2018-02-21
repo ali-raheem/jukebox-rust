@@ -1,5 +1,7 @@
 # Jukebox-rust
 
+[![Build Status](https://travis-ci.org/wolfmankurd/jukebox-rust.svg?branch=master)](https://travis-ci.org/wolfmankurd/jukebox-rust)
+
 Rust implementation of my jukebox application which allows RFID tags to trigger commands such as opening pictures or play albums.
 
 GPLv2
