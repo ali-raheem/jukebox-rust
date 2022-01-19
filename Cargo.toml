@@ -1,14 +1,14 @@
 [package]
 name = "jukebox"
-version = "0.1.6"
-authors = ["Ali Raheem <ali@TheRaheemFamily.co.uk>"]
+version = "0.2.0"
+authors = ["Ali Raheem <jukebox@shoryuken.me>"]
 description = "Link serial inputs (e.g. USB RFID tags) to actions (e.g. play a movie)."
-homepage = "https://github.com/wolfmankurd/jukebox-rust/"
-repository = "https://github.com/wolfmankurd/jukebox-rust/"
+homepage = "https://github.com/ali-raheem/jukebox-rust"
+repository = "https://github.com/ali-raheem/jukebox-rust"
 readme = "README.md"
 license = "GPL-2.0"
 
 [dependencies]
-rusqlite = "*"
-getopts = "*"
-serial = "*"
+rusqlite = "0.26.3"
+getopts = "0.2.21"
+serialport = "4.0.1"
