@@ -4,7 +4,7 @@ Rust implementation of my jukebox application which allows RFID tags to trigger 
 
 ## Installation
 
-Via crates.io `cargo install jukebox`.
+Build with cargo in the usual way.
 
 ### Dependencies
 
