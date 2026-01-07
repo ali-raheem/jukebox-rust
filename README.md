@@ -1,81 +1,105 @@
 # Jukebox-rust
 
-[![Build Status](https://travis-ci.org/wolfmankurd/jukebox-rust.svg?branch=master)](https://travis-ci.org/wolfmankurd/jukebox-rust)
+Rust application that links RFID tags to scripts - tap a card to play an album, open a picture, or trigger any action.
 
-Rust implementation of my jukebox application which allows RFID tags to trigger commands such as opening pictures or play albums.
+GPLv2 | v0.3.0
 
-GPLv2
-
-v 0.1.6
+## Usage
 
 ```
-ali@ali-K53E:~/Code/Rust/jukebox$ ./target/debug/jukebox -h
-Jukebox is a program which connects triggers
-e.g. RFID keys to actions e.g. playing an album.
-Usage:	./target/debug/jukebox [options]
+jukebox [options]
 
 Options:
     -h, --help          Print this usage information.
     -n, --new           Start new database.
     -a, --add           Add mode, add new action triggers to database.
-    -f, --database PATH Suggest a name for the database file default
-                        ./jukebox.db
-    -p, --port PATH     Serial port to use default /dev/ttyACM0
-    -s, --split Start:Length
-                        Process key trim first Start chars and continue for
-                        length chars default 3:10.
-
+    -f, --database PATH Database file (default: ./jukebox.db)
+    -p, --port PATH     Serial port (default: /dev/ttyACM0)
+    -s, --split START:LENGTH
+                        Key trimming parameters (default: 3:10)
+    -d, --scripts PATH  Script directory (default: /etc/jukebox.d)
 ```
 
-Example usage would be putting a RFID tag/card in a CD case and using it to trigger your computer to play said album.
+## Building
 
-#### Building
-Uses the cargo buildsystem for dependencies and building.
+Requires sqlite3 development libraries:
+```bash
+# Fedora/RHEL
+sudo dnf install libsqlite3x-devel
 
-Install developement libraries for sqlite3 (sudo dnf install lib-sqlite3x-devel).
-
-To build run:
-
-```
-$ cargo build --release
+# Debian/Ubuntu
+sudo apt install libsqlite3-dev
 ```
 
-#### Running
-It is suggested to make a database like in the current directory and then copy it to /etc and make it root writeable but world readable.
-
-First start a new database
-```
-$ jukebox -n -a
-```
-This will initialise a new database file by default jukebox.db and start in adder mode allowing you to scan in keys and commands.
-
-To do this tap cards on the reader to load it's buffer with the string and then enert the command to associate with it in jukebox.
-
-This will loop endlessly until you ctrl-c (kill the program).
-
-It is suggested you copy the database somewhere more secure and make it owned by root but readable by the jukebox user.
-
-To run in production mode might look like this
-
-```
-$ jukebox -f /etc/jukebox.db
+Build:
+```bash
+cargo build --release
 ```
 
-You *should not* run jukebox as root as then an spawned commands wound run as root! By making the db root only writable you can stop someone putting a nasty command in your db.
+## Setup
 
-You could use a udev rule to make the serial device readble by the user you run jukebox as. In my case my device is in the group dialout. So I simply added my user to the group as root:
-It is likely you can do this too if ls -lah PATH_TO_DEVICE shows dialout as the group (if it shows another group thats not root you could add yourself to that).
+### 1. Create script directory
 
+```bash
+sudo mkdir -p /etc/jukebox.d
+sudo chown root:root /etc/jukebox.d
+sudo chmod 755 /etc/jukebox.d
 ```
-# useradd -a -G dialout ali
+
+### 2. Add scripts
+
+Create executable scripts for each action. Example:
+
+```bash
+# /etc/jukebox.d/play_jazz
+#!/bin/bash
+mpv /music/jazz/
 ```
-Where ali is your username.
 
-#### To Do
-Make saner defaults (0:0)
+Make scripts executable:
+```bash
+sudo chmod +x /etc/jukebox.d/*
+```
 
-#### Changelog
+### 3. Create database and register cards
 
-* 2017-06-14 - Gracefully handle unknown arguments
-* 2017-06-13 - Use Connection not SqliteConnection for modern rusqlite. Builds with rustc 1.19.0-nightly (cfb5debbc 2017-06-12)
-               
+```bash
+jukebox -n -a
+```
+
+This creates a new database and enters add mode. The available scripts are listed. Tap a card, then enter the script name to associate with it. Repeat for each card. Press Ctrl+C when done.
+
+### 4. Run in production
+
+```bash
+jukebox -f /etc/jukebox.db
+```
+
+## Security
+
+This version uses a **script directory approach** instead of arbitrary shell commands:
+
+- Only scripts in the designated directory (`/etc/jukebox.d`) can be executed
+- Script names cannot contain path separators (no `../` attacks)
+- Scripts are executed directly (no shell interpretation)
+
+Recommendations:
+- **Do not run jukebox as root** - spawned scripts inherit privileges
+- Make scripts root-owned: `sudo chown root:root /etc/jukebox.d/*`
+- Make database root-owned but world-readable
+- Add your user to the `dialout` group for serial device access:
+  ```bash
+  sudo usermod -a -G dialout $USER
+  ```
+
+## Migrating from 0.2.x
+
+Version 0.3.0 introduces breaking changes:
+
+1. Commands are no longer stored in the database - only script names
+2. You must create scripts in `/etc/jukebox.d/` (or custom `-d` path)
+3. Re-register your cards with `jukebox -a` using script names
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
