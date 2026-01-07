@@ -96,7 +96,7 @@ dependencies = [
 
 [[package]]
 name = "jukebox"
-version = "0.1.6"
+version = "0.3.0"
 dependencies = [
  "getopts",
  "rusqlite",

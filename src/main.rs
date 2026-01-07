@@ -1,31 +1,49 @@
 use getopts::Options;
 use rusqlite::Connection;
 use std::io::{self, BufRead, BufReader};
+use std::path::Path;
 use std::process::Command;
 use std::time::Duration;
 use std::{env, fmt};
 
+const DEFAULT_SCRIPT_DIR: &str = "/etc/jukebox.d";
+
+fn is_valid_script_name(name: &str) -> bool {
+    !name.is_empty()
+        && !name.contains('/')
+        && !name.contains('\\')
+        && name != "."
+        && name != ".."
+        && !name.contains('\0')
+}
+
 struct Action {
-    cmd: String,
+    script: String,
     key: String,
 }
 
 impl fmt::Display for Action {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}: {}", self.key, self.cmd)
+        write!(f, "{}: {}", self.key, self.script)
     }
 }
 
 impl Action {
-    fn exec(self) {
-        println!("Action: {}", self.cmd);
-        match Command::new("sh")
-                             .arg("-c")
-                             .arg(self.cmd)
-            .status() {
-                Ok(n) => println!("Finished, returned {}.", n),
-                Err(e) => println!("Failed to run, exit code {}.", e),
-            };
+    fn exec(&self, script_dir: &Path) {
+        if !is_valid_script_name(&self.script) {
+            eprintln!("Invalid script name: {}", self.script);
+            return;
+        }
+        let script_path = script_dir.join(&self.script);
+        if !script_path.exists() {
+            eprintln!("Script not found: {}", script_path.display());
+            return;
+        }
+        println!("Running: {}", script_path.display());
+        match Command::new(&script_path).status() {
+            Ok(status) => println!("Finished, returned {}.", status),
+            Err(e) => eprintln!("Failed to run: {}.", e),
+        }
     }
 }
 
@@ -55,6 +73,10 @@ fn main() {
                      "Process key trim first Start chars and continue for length chars default \
                       3:10.",
                      "Start:Length");
+    prog_opts.optopt("d",
+                     "scripts",
+                     "Directory containing scripts (default /etc/jukebox.d)",
+                     "PATH");
     let prog_opts_matches = match prog_opts.parse(&args[1..]) {
         Ok(m) => {
             m
@@ -85,6 +107,18 @@ fn main() {
     };
     let mut reader = BufReader::new(port);
     let db_file = prog_opts_matches.opt_str("f").unwrap_or_else(|| "./jukebox.db".to_owned());
+    let script_dir = Path::new(
+        &prog_opts_matches
+            .opt_str("d")
+            .unwrap_or_else(|| DEFAULT_SCRIPT_DIR.to_owned()),
+    )
+    .to_owned();
+    if !script_dir.is_dir() {
+        eprintln!(
+            "Warning: Script directory does not exist: {}",
+            script_dir.display()
+        );
+    }
     let conn = Connection::open(db_file).unwrap();
     if prog_opts_matches.opt_present("n") {
         conn.execute(
@@ -97,8 +131,16 @@ fn main() {
         .unwrap();
     }
     if prog_opts_matches.opt_present("a") {
+        println!("Available scripts in {}:", script_dir.display());
+        if let Ok(entries) = std::fs::read_dir(&script_dir) {
+            for entry in entries.flatten() {
+                if let Some(name) = entry.file_name().to_str() {
+                    println!("  {}", name);
+                }
+            }
+        }
         loop {
-            println!("Tap card on reader...\nCtrl+C to exit.");
+            println!("\nTap card on reader...\nCtrl+C to exit.");
             let mut input = String::new();
             if reader.read_line(&mut input).is_err() || input.is_empty() {
                 continue;
@@ -109,23 +151,36 @@ fn main() {
             }
             input.drain(..key_start_char);
             input.truncate(key_length);
-            println!("Card read: {}. Enter command:", input);
-            let mut cmd = String::new();
-            io::stdin().read_line(&mut cmd).expect("Could not read line from STDIN.");
-            let cmd = cmd.trim().to_owned();
-            if cmd.is_empty() {
-                println!("Empty command, skipping.");
+            println!("Card read: {}. Enter script name:", input);
+            let mut script = String::new();
+            io::stdin()
+                .read_line(&mut script)
+                .expect("Could not read line from STDIN.");
+            let script = script.trim().to_owned();
+            if script.is_empty() {
+                println!("Empty script name, skipping.");
                 continue;
+            }
+            if !is_valid_script_name(&script) {
+                println!("Invalid script name (no paths allowed): {}", script);
+                continue;
+            }
+            let script_path = script_dir.join(&script);
+            if !script_path.exists() {
+                println!(
+                    "Warning: Script does not exist: {}",
+                    script_path.display()
+                );
             }
             match conn.execute(
                 "INSERT INTO jukebox (cmd, key) VALUES ($1, $2)",
-                [&cmd, &input],
+                [&script, &input],
             ) {
                 Ok(_) => {
-                    println!("Action added command: {}, trigger: {}.", cmd, input);
+                    println!("Added: card {} -> script {}", input, script);
                 }
-                Err(_) => {
-                    println!("Failed to add command: {}, trigger:{}.", cmd, input);
+                Err(e) => {
+                    println!("Failed to add: {} ({})", script, e);
                 }
             }
         }
@@ -140,16 +195,16 @@ fn main() {
         }
         input.drain(..key_start_char);
         input.truncate(key_length);
-        println!("Serial device said {}.", input);
-        let mut sql_req = match conn.prepare("SELECT cmd, key FROM jukebox WHERE key = (?)") {
+        println!("Card scanned: {}", input);
+        let mut stmt = match conn.prepare("SELECT cmd, key FROM jukebox WHERE key = (?)") {
             Ok(x) => x,
             Err(_) => {
                 continue;
             }
         };
-        let action_iter = match sql_req.query_map([&input], |row| {
+        let action_iter = match stmt.query_map([&input], |row| {
             Ok(Action {
-                cmd: row.get(0)?,
+                script: row.get(0)?,
                 key: row.get(1)?,
             })
         }) {
@@ -161,11 +216,11 @@ fn main() {
         for action in action_iter {
             match action {
                 Ok(trigger) => {
-                    println!("Found match: {}.", trigger);
-                    trigger.exec();
+                    println!("Found match: {}", trigger);
+                    trigger.exec(&script_dir);
                 }
                 Err(_) => {
-                    println!("Not an action.")
+                    eprintln!("Error reading action from database.")
                 }
             }
         }

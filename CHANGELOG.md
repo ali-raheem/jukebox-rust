@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0] - 2025-01-07
+
+### Breaking Changes
+- Commands are no longer executed via shell - only scripts from a designated directory
+- Database entries now store script names instead of shell commands
+- Existing databases must be recreated with new card registrations
+
+### Added
+- Script directory approach for secure command execution (`-d` / `--scripts` option)
+- Script name validation (prevents path traversal attacks)
+- Lists available scripts when entering add mode
+- Warning when script directory or script doesn't exist
+
+### Security
+- No shell interpretation - scripts executed directly
+- Path traversal prevention (rejects `/`, `\`, `..` in script names)
+- Only scripts in the designated directory can run
+
 ## [0.2.0] - 2025-01-07
 
 ### Changed
